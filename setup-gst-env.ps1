@@ -30,8 +30,18 @@ $PKGS = @(
 )
 
 Write-Host "== Checking MSYS2 install paths =="
-foreach ($p in @($BASH_EXE, $PY_EXE)) {
-  if (-not (Test-Path $p)) { throw "Missing: $p (check MSYS2_ROOT = $MSYS2_ROOT)" }
+if (-not (Test-Path $BASH_EXE)) {
+  throw "Missing: $BASH_EXE (check MSYS2_ROOT = $MSYS2_ROOT)"
+}
+
+# Ensure Python is installed via pacman if missing
+if (-not (Test-Path $PY_EXE)) {
+  Write-Host "== Python not found, installing via pacman =="
+  & $BASH_EXE -lc "pacman -Sy --noconfirm mingw-w64-x86_64-python" | Write-Host
+}
+
+if (-not (Test-Path $PY_EXE)) {
+  throw "Python still missing after install attempt: $PY_EXE"
 }
 
 # Make sure MinGW64 binaries/dlls come first for this PowerShell session
@@ -57,6 +67,17 @@ if (Test-Path $VENV_DIR) {
 
 Write-Host "== Activating venv (PowerShell) =="
 & (Join-Path $VENV_DIR $ACTIVATE_)
+
+Write-Host "== Ensuring pip is available and up to date =="
+python -m ensurepip --upgrade
+python -m pip install --upgrade pip setuptools wheel
+
+if (Test-Path "requirements.txt") {
+  Write-Host "== Installing Python dependencies from requirements.txt =="
+  pip install -r requirements.txt
+} else {
+  Write-Host "== No requirements.txt found, skipping pip install =="
+}
 
 Write-Host "== Exporting runtime env vars for GI + GStreamer =="
 # GI typelibs (Gst, GLib, etc.)

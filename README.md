@@ -26,8 +26,9 @@ Default installation path used by the project:
 
 `C:\dev\msys64`
 
+You can find it here on their website: https://www.msys2.org/
 
-If MSYS2 is installed elsewhere, update the path inside the setup script.
+> **Note:** If MSYS2 is installed elsewhere, update the path inside the setup script.
 
 ## 2) Run the setup script (GStreamer + Python bindings)
 
