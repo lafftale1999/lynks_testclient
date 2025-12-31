@@ -56,7 +56,6 @@ if (Test-Path $VENV_DIR) {
 & $PY_EXE -m venv --system-site-packages $VENV_DIR
 
 Write-Host "== Activating venv (PowerShell) =="
-# Your venv uses bin\activate.ps1, keep that:
 & (Join-Path $VENV_DIR $ACTIVATE_)
 
 Write-Host "== Exporting runtime env vars for GI + GStreamer =="
