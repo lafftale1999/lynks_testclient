@@ -11,34 +11,31 @@ class JanusPub(PipelineBase):
                  audio_src: str = "wasapi2src"):
 
         janus_sink = f"""
-            {CommonDefines.JANUS_MEDIA_SINK} 
+            {CommonDefines.JANUS_MEDIA_SINK} name=jsink
             signaller::janus-endpoint={endpoint} 
             signaller::room-id={room_id} 
             signaller::feed-id={feed_id}
         """
 
         pipeline_str = f"""
-          {janus_sink}
-
-          {video_src} !
+        {janus_sink}
+        
+        {video_src} !
             queue !
             videoconvert !
             video/x-raw,framerate=30/1 !
-            queue !
             vp8enc deadline=1 cpu-used=8 !
-            rtpvp8pay !
             queue !
-            jsink.
-
-          {audio_src} !
+            jsink.video_0
+        
+        {audio_src} !
             queue !
             audioconvert !
             audioresample !
             audio/x-raw,rate=48000,channels=2 !
             opusenc bitrate=64000 !
-            rtpopuspay !
             queue !
-            jsink.
+            jsink.audio_0
         """
 
         super().__init__("Publisher", squash_string(pipeline_str))

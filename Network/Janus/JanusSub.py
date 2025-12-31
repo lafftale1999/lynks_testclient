@@ -14,25 +14,30 @@ class JanusSub(PipelineBase):
 
         janus_src = f"""
             {CommonDefines.JANUS_MEDIA_SRC} name=src
-                signaller:janus-endpoint={endpoint}
-                signaller:janus-room-id={room_id}
-                signaller:janus-feed-id={feed_id}"""
+                signaller::janus-endpoint={endpoint}
+                signaller::room-id={room_id}
+                signaller::producer-peer-id={feed_id}
+        """
 
         pipeline_str = f"""
-            src. !
-                queue !
-                application/x-rtp,media=video !
-                decodebin !
-                videoconvert !
-                {video_sink} sync=false
-                
-            src. !
-                queue !
-                application/x-rtp,media=audio !
-                decodebin !
-                audioconvert !
-                audioresample !
-                {audio_sink} sync=false
-            """
+        {janus_src}
+
+        src. !
+          queue !
+          application/x-rtp,media=video !
+          rtpvp8depay !
+          vp8dec !
+          videoconvert !
+          {video_sink}
+
+        src. !
+          queue !
+          application/x-rtp,media=audio !
+          rtpopusdepay !
+          opusdec !
+          audioconvert !
+          audioresample !
+          {audio_sink}
+        """
 
         super().__init__("Subscriber", squash_string(pipeline_str))
