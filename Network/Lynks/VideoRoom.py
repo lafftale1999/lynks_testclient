@@ -60,8 +60,8 @@ class VideoRoom:
     def subscribe_to_feed_retry(
         self,
         incoming_feed_id: int,
-        max_tries: int = 10,
-        total_budget_s: float = 10.0,
+        max_tries: int = JANUS_RECONNECT_TRIES,
+        total_budget_s: float = JANUS_RECONNECT_TIME,
         backoff_s: float = 0.2,
     ) -> bool:
 

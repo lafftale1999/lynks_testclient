@@ -46,9 +46,14 @@ class LynksRepo:
             headers=headers
         )
 
-        if r.status_code == 200 or r.json()['action'] == 'success':
-            print(r.json())
-            return r.json()['room_id']
+        print("status:", r.status_code)
+        print("content-type:", r.headers.get("Content-Type"))
+        print("text:", repr(r.text[:500]))  # show first 500 chars safely
+
+        if r.status_code == 200:
+            data = r.json()
+            print(data)
+            return data["room_id"]
 
         else:
             return "fail"

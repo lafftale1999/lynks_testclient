@@ -2,18 +2,21 @@ import json
 from time import sleep
 
 from . import LynksService
+from Common.CommonDefines import *
 
 class LynksUser:
     def __init__(self,
                  username: str,
                  password: str,
-                 sub_and_pub: bool = False):
+                 publisher: bool = False,
+                 subscriber: bool = False):
         self.video_room = None
         self.username = username
         self.password = password
         self.token = None
         self.service = LynksService.LynksService()
-        self.sub_and_pub = sub_and_pub
+        self.publisher = publisher
+        self.subscriber = subscriber
 
 
     def to_json(self) -> dict[str, str]:
@@ -34,42 +37,45 @@ class LynksUser:
 
 
     def join_room(self, room_id: int):
-        self.video_room = self.service.join_room(self.token, room_id)
-        self.video_room.subscribe = self.sub_and_pub
+        self.video_room = self.service.join_room(room_id)
+        self.video_room.subscribe = self.subscriber
 
-    def create_room(self):
+    def create_room(self) -> int:
         self.video_room = self.service.create_room(self.token)
-        self.video_room.subscribe = self.sub_and_pub
+        self.video_room.subscribe = self.subscriber
+        return self.video_room.room_id
 
     def update_room(self):
         participants: list[int] = []
 
         while True:
-            print("checking new participants")
-            check_participants = self.service.get_participants(self.token, self.video_room.room_id)
 
-            if not check_participants:
-                sleep(5)
-                continue
+            if self.video_room is not None and self.video_room.subscribe is not False:
+                print("checking new participants")
+                check_participants = self.service.get_participants(self.token, self.video_room.room_id)
 
-            for participant in check_participants:
-                if participant in participants:
+                if not check_participants:
+                    sleep(5)
                     continue
 
-                print(f"Participant found: {participant}")
+                for participant in check_participants:
+                    if participant in participants:
+                        continue
 
-                ok = self.video_room.subscribe_to_feed_retry(
-                    participant,
-                    max_tries=10,
-                    total_budget_s=10.0,
-                    backoff_s=0.2
-                )
+                    print(f"Participant found: {participant}")
 
-                if ok:
-                    participants.append(participant)
-                else:
-                    print("Could not establish stable connection. Exiting.")
-                    return
+                    ok = self.video_room.subscribe_to_feed_retry(
+                        participant,
+                        max_tries=JANUS_RECONNECT_TRIES,
+                        total_budget_s=JANUS_RECONNECT_TIME,
+                        backoff_s=0.2
+                    )
+
+                    if ok:
+                        participants.append(participant)
+                    else:
+                        print("Could not establish stable connection. Exiting.")
+                        return
 
             sleep(5)
 

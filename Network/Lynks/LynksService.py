@@ -19,24 +19,18 @@ class LynksService:
         # Create and retrieve room id
         r = self.repo.create_room(token)
 
+        print(r)
+
         # Construct a video room using the room id
         room = VideoRoom.VideoRoom(int(r))
         room.start()
 
         return room
 
-    def join_room(self, token: str, room_id: int) -> VideoRoom.VideoRoom:
-        # Find participants currently in video room
-        participants = self.repo.join_room(token, room_id)
-
+    def join_room(self, room_id: int) -> VideoRoom.VideoRoom:
         # Create video room
         room = VideoRoom.VideoRoom(int(room_id))
-
-        # Subscribe to participants
-        for participant in participants:
-            room.subscribe_to_feed(participant)
-
-        room.publish_to_feed()
+        room.start()
 
         return room
 
