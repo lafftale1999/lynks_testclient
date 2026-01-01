@@ -11,13 +11,25 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Create or join room")
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-create", "-c", action="store_true", help="Create room")
-    group.add_argument("-join", "-j", metavar="ROOM_ID", type=int, help="Join room by room id")
+    group.add_argument("--create", "-c", action="store_true", help="Create room")
+    group.add_argument("--join", "-j", metavar="ROOM_ID", type=int, help="Join room by room id")
 
     parser.add_argument(
-        "-sub", "-s",
+        "--sub", "-s",
         action="store_true",
         help="Subscribe to publishing streams in the room",
+    )
+
+    parser.add_argument(
+        "-p", "--password",
+        metavar="PASSWORD",
+        help="Set password for Lynks user"
+    )
+
+    parser.add_argument(
+        "-u", "--username",
+        metavar="USERNAME",
+        help="Set username for Lynks user"
     )
 
     return parser.parse_args()
@@ -35,10 +47,15 @@ def main():
     loop.start()
 
     user = None
+
     try:
         subscribe = bool(args.sub)
 
-        user = LynksUser("testuser", "test123", True, subscribe)
+        if args.password is not None and args.username is not None:
+            user = LynksUser(args.username, args.password, True, subscribe)
+        else:
+            user = LynksUser("testuser", "test123", True, subscribe)
+
         user.log_in()
 
         if args.create:

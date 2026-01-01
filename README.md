@@ -104,6 +104,24 @@ Ensure these match your Docker-exposed ports and hostnames (e.g. localhost).
 # Start the client
 To start the client, ensure that the virtual environment is running and configured as described in [`Requirements`](#requirements).
 
+The easiest way to start the client is to run one of the following commands:
+
+* First time / if a room hasn't been created yet:
+  ```shell
+  python main.py --create --sub
+  ```
+
+* If a room already has been created:
+  ```shell
+  python main.py --join 123456 --sub
+  ```
+
+---
+
+## Stop the client
+Click the terminal running the client and press the keys `CTRL + C`. This should throw a `KeyboardInterrupt` which will
+ensure the client shuts down gracefully.
+
 ---
 
 ## Publish / Subscribe mode
@@ -118,39 +136,59 @@ If the **-sub** flag is provided, the client will also subscribe to other publis
   ```
 * **Create room** *(publish only)*
   ```shell
-  python main.py -create
+  python main.py --create
   ```
 
 * **Create room** *(publish-and-subscribe)*
   ```shell
-  python main.py -create -sub
+  python main.py --create -sub
   ```
 
 * **Join room** *(publish only)*
   ```shell
-  python main.py -join <ROOM_ID>
+  python main.py --join <ROOM_ID>
   ```
 
 * **Join room** *(publish-and-subscribe)*
   ```shell
-    python main.py -join <ROOM_ID> -sub
+    python main.py --join <ROOM_ID> -sub
     ```
 
 > **Attention:** The -create or -join flag is mandatory, as the program will not start if it doesn't connect to
 > a room.
 ---
 
+## Username and password
+By default, the client uses the following values as username and password:
+```txt
+username="testuser"
+password="test123"
+```
+
+These are the same as the ones generated in the database when running the `Docker` container.
+
+By utilizing the `-u`/`--username` and `-p`/`--password` flags, you can run the `testclient` without changing
+any variables.
+
+```shell
+python main.py --join 123456 -sub -u testuser -p test123
+```
+
+---
+
 ## Flags
 The following flags are available for running the client in the CLI.
 
-| Flag   	                      | Description  	                                           |
-|-------------------------------|----------------------------------------------------------|
-| -create, -c   	               | Creates a new room and publishes to it      	            |
-| -join <ROOM_ID>, -j <ROOM_ID> | Joins the room with <ROOM_ID> and published to it      	 |
-| -sub, -s   	                  | Subscribes to all publishing streams in the room      	  |
-| --help, -h   	                | List available commands      	                           |
-
+| Flag   	                       | Description  	                                           |
+|--------------------------------|----------------------------------------------------------|
+| --create, -c   	               | Creates a new room and publishes to it      	            |
+| --join <ROOM_ID>, -j <ROOM_ID> | Joins the room with <ROOM_ID> and published to it      	 |
+| --sub, -s   	                  | Subscribes to all publishing streams in the room      	  |
+| --username, -u   	             | Use specified username      	                            |
+| --password, -p   	             | Use specified password      	                            |
+| --help, -h   	                 | List available commands      	                           |
 ---
+
 
 ## Typical client flow
 
