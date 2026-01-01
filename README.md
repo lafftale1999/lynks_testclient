@@ -31,7 +31,7 @@ Default installation path used by the project:
 
 You can find it here on their website: https://www.msys2.org/
 
-> **Note:** If MSYS2 is installed elsewhere, update the path inside the setup script.
+> **Note:** If MSYS2 is installed elsewhere, update the path inside [`.\setup-gst-env.ps1`](.\setup-gst-env.ps1).
 
 ---
 
